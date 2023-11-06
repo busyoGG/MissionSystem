@@ -458,10 +458,12 @@ public class ScrollViewScript<T> : MonoBehaviour
         _head = _items[0];
         _tail = _items[_items.Count - 1];
 
+
+        //更新UI大小
+        _rectTransform.sizeDelta = new Vector2(_rectTransform.rect.width, -maxHeight);
+
         if (FitSize)
         {
-            //更新UI大小
-            _rectTransform.sizeDelta = new Vector2(_rectTransform.rect.width, -maxHeight);
             float contentHeight = _rectTransform.rect.height;
 
             if (contentHeight < _viewHeight)
