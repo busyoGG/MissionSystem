@@ -490,7 +490,7 @@ public class ScrollViewScript<T> : MonoBehaviour
 
 
         //更新UI大小
-        _rectTransform.sizeDelta = new Vector2(_rectTransform.rect.width, -maxHeight);
+        _rectTransform.sizeDelta = new Vector2(0, -maxHeight);
 
         if (FitSize)
         {
@@ -501,7 +501,8 @@ public class ScrollViewScript<T> : MonoBehaviour
             //    _viewHeight = contentHeight;
             //}
 
-            Scroll.GetComponent<RectTransform>().sizeDelta = _rectTransform.sizeDelta;
+            RectTransform scrollRect = Scroll.GetComponent<RectTransform>();
+            scrollRect.sizeDelta = new Vector2(scrollRect.rect.width, -maxHeight);
         }
     }
 
@@ -531,9 +532,12 @@ public class ScrollViewScript<T> : MonoBehaviour
     /// </summary>
     /// <param name="itd"></param>
     /// <param name="size"></param>
-    protected void SetCellSize(ItemTransformData itd, Vector2 size)
+    protected void SetCellSize(ItemTransformData itd, Vector2 size, bool resize = true)
     {
         _itemSize[itd.item_type][itd.item_index] = size;
-        Resize();
+        if (resize)
+        {
+            Resize();
+        }
     }
 }

@@ -124,6 +124,7 @@ public class MissionScrollView : ScrollViewScript<MissionTree>
         //bsvRect.sizeDelta = new Vector2(bsv]Rect.rect.width, 0);
         if (cell.height >= bsvRect.rect.height + 50)
         {
+            SetCellSize(cell, new Vector2(cell.width, 50 + bsvRect.rect.height),false);
             bsv.Scroll.transform.localPosition = new Vector2(10, bsv.Scroll.transform.localPosition.y);
         }
         else

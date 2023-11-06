@@ -6,13 +6,30 @@ using UnityEngine.UI;
 
 public class BranchScrollView : ScrollViewScript<MissionTree>
 {
-    public List<MissionTree> inputData;
+    private bool _inited = false;
+    public List<MissionTree> inputData
+    {
+        get
+        {
+            return _inputData;
+        }
+        set
+        {
+            _inputData = value;
+            if(_inited ) { 
+                this.data = value;
+            }
+        }
+    }
+    public List<MissionTree> _inputData;
+
     private void Start()
     {
         Debug.Log("≥ı ºªØbranch");
         base.Start();
         actions.Add(UpdateItemDataMission);
-        this.data = inputData;
+        this.data = _inputData;
+        _inited = true;
     }
     protected void UpdateItemDataMission(ItemTransformData cell, int index)
     {

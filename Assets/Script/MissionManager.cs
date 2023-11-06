@@ -129,12 +129,30 @@ public class MissionManager
         m4.is_pre_unlock = true;
         m4.branch_belong = 0;
 
+        MissionTree m5 = new MissionTree();
+        m5.id = 0;
+        m5.m_id = 3;
+        m5.title = "任务4-1";
+        m5.describe = "任务4-1的任务描述";
+        m5.type = MissionType.Collection;
+        m5.filter = MissionFilter.Branch;
+        m5.is_pre_count = false;
+        m5.target.Add(0);
+        m5.target_describe.Add("收集id=0的物品");
+        m5.target_num.Add(0, 2);
+        m5.award.Add("奖励1");
+        m5.award_num.Add(1);
+        m5.is_pre_unlock = true;
+        m5.branch_belong = 0;
+
         m1.unlock_mission.Add(1);
         m2.branch.Add(2);
+        m2.branch.Add(3);
 
         missions.Add(m1);
         missions.Add(m3);
         missions.Add(m4);
+        missions.Add(m5);
 
         //初始化
         for (int i = 0, len = missions.Count; i < len; i++)
@@ -332,14 +350,28 @@ public class MissionManager
 
         if (mission.filter == MissionFilter.Branch)
         {
-            Next(GetUnlockedMissionById(mission.branch_belong));
+            bool missionDone = true;
+            foreach (var id in mission.branch)
+            {
+                MissionTree branch = GetUnlockedMissionById(id);
+                if (mission != null)
+                {
+                    missionDone = false;
+                    break;
+                }
+            }
+            if (!missionDone)
+            {
+                Next(GetUnlockedMissionById(mission.branch_belong));
+            }
         }
     }
 
     private void GetAward(MissionTree mission)
     {
         string award = "";
-        for(int i = 0,len = mission.award.Count; i < len; i++) {
+        for (int i = 0, len = mission.award.Count; i < len; i++)
+        {
             award += mission.award[i] + " 数量:" + mission.award_num[i];
         }
         Debug.Log("获得任务奖励 ===> " + award);
