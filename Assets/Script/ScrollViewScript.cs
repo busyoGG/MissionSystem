@@ -346,14 +346,15 @@ public class ScrollViewScript<T> : MonoBehaviour
             if (current.cell_index == 0)
             {
                 bonusX = OffsetX;
+                bonusY = OffsetY;
             }
             else if (current.cell_index / RepeatX == 0)
             {
-                bonusX = last.width + SpaceX + OffsetX;
+                bonusX = last.width + SpaceX;
             }
             else
             {
-                bonusY = last.height + SpaceY + OffsetY;
+                bonusY = last.height + SpaceY;
             }
         }
         else if (RepeatY != 0)
@@ -361,14 +362,15 @@ public class ScrollViewScript<T> : MonoBehaviour
             if (current.cell_index == 0)
             {
                 bonusY = OffsetY;
+                bonusX = OffsetX;
             }
             else if (current.cell_index / RepeatY == 0)
             {
-                bonusY = last.height + SpaceY + OffsetY;
+                bonusY = last.height + SpaceY;
             }
             else
             {
-                bonusX = last.width + SpaceX + OffsetX;
+                bonusX = last.width + SpaceX;
             }
         }
         else
@@ -376,6 +378,7 @@ public class ScrollViewScript<T> : MonoBehaviour
             if (current.cell_index == 0)
             {
                 bonusX = OffsetX;
+                bonusY = OffsetY;
             }
             else if (last.pos.x + last.width + SpaceX + current.width <= _viewWidth)
             {

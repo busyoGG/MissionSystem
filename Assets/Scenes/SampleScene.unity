@@ -1286,6 +1286,7 @@ MonoBehaviour:
   - {fileID: 2427392728733781602, guid: 0028ff94c03ac384da886ad66bc2e905, type: 3}
   Stack: {fileID: 1229437401}
   Scroll: {fileID: 1229437403}
+  FitSize: 1
   SpaceX: 0
   SpaceY: 0
   OffsetX: 0
@@ -1669,6 +1670,7 @@ MonoBehaviour:
   - {fileID: 2427392728733781602, guid: 0028ff94c03ac384da886ad66bc2e905, type: 3}
   Stack: {fileID: 243819894}
   Scroll: {fileID: 1837742376}
+  FitSize: 1
   SpaceX: 0
   SpaceY: 0
   OffsetX: 0
@@ -1819,11 +1821,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1164030669671834108, guid: dc6a77beac546c546a592896da09d856, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1164030669671834108, guid: dc6a77beac546c546a592896da09d856, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 525
       objectReference: {fileID: 0}
     - target: {fileID: 1164030669671834108, guid: dc6a77beac546c546a592896da09d856, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -1917,6 +1919,14 @@ PrefabInstance:
       propertyPath: Title
       value: 
       objectReference: {fileID: 3590453649156889470, guid: ad74cd9ce3208104981d1faab498e3d6, type: 3}
+    - target: {fileID: 9073202287304000470, guid: dc6a77beac546c546a592896da09d856, type: 3}
+      propertyPath: FitSize
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9073202287304000470, guid: dc6a77beac546c546a592896da09d856, type: 3}
+      propertyPath: OffsetY
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 9073202287304000470, guid: dc6a77beac546c546a592896da09d856, type: 3}
       propertyPath: RepeatX
       value: 1
