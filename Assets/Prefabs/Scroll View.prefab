@@ -175,8 +175,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0008370925}
-  m_SizeDelta: {x: 0, y: 1000}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 525}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &9073202287304000470
 MonoBehaviour:
@@ -190,15 +190,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ff2ee772e8407841a78e7dd8e8db42b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PrefabItem: {fileID: 2427392728733781602, guid: 0028ff94c03ac384da886ad66bc2e905, type: 3}
+  PrefabItem:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   Stack: {fileID: 2717200044051515008}
   Scroll: {fileID: 8183124785500299595}
+  FitSize: 0
   SpaceX: 0
   SpaceY: 10
   OffsetX: 5
   OffsetY: 5
   RepeatX: 0
   RepeatY: 0
+  _subData: []
 --- !u!1 &9206663041585880190
 GameObject:
   m_ObjectHideFlags: 0

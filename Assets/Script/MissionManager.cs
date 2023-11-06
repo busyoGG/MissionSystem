@@ -102,13 +102,14 @@ public class MissionManager
         m3.title = "任务2-1";
         m3.describe = "任务2-1的任务描述";
         m3.type = MissionType.Collection;
-        m3.filter = MissionFilter.Main;
+        m3.filter = MissionFilter.Sub;
         m3.is_pre_count = false;
         m3.target.Add(0);
         m3.target_describe.Add("收集id=0的物品");
         m3.target_num.Add(0, 2);
         m3.award.Add("奖励1");
         m3.award_num.Add(1);
+        //m3.is_pre_unlock = true;
 
         m1.unlock_mission.Add(1);
 
@@ -173,6 +174,40 @@ public class MissionManager
         MissionTree missionTree;
         _unlockedMission.TryGetValue(id, out missionTree);
         return missionTree;
+    }
+
+    /// <summary>
+    /// 获得任务筛选类型文字描述
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public string GetMissionFilterString(MissionFilter type)
+    {
+        switch (type)
+        {
+            case MissionFilter.Main:
+            default:
+                return "主线";
+            case MissionFilter.Sub:
+                return "支线";
+        }
+    }
+
+    /// <summary>
+    /// 获得任务筛选类型
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <returns></returns>
+    public MissionFilter GetMissionFileter(string filter)
+    {
+        switch (filter)
+        {
+            case "主线":
+            default:
+                return MissionFilter.Main;
+            case "支线":
+                return MissionFilter.Sub;
+        }
     }
 
     /// <summary>
@@ -258,6 +293,9 @@ public class MissionManager
                     SaveMissionData(id, unlockMission.id, unlockMission.complete_num, false);
                 }
             }
+            //获得奖励
+            GetAward(mission);
+            //下一任务
             _unlockedMission[missionId] = next;
             //保存数据
             SaveMissionData(missionId, next.id, next.complete_num, false);
@@ -269,6 +307,15 @@ public class MissionManager
             //保存数据
             SaveMissionData(missionId, mission.id, mission.complete_num, true);
         }
+    }
+
+    private void GetAward(MissionTree mission)
+    {
+        string award = "";
+        for(int i = 0,len = mission.award.Count; i < len; i++) {
+            award += mission.award[i] + " 数量:" + mission.award_num[i];
+        }
+        Debug.Log("获得任务奖励 ===> " + award);
     }
 
     private void SaveMissionData(int missionId, int stepId, Dictionary<int, float> completeNum, bool isDone)

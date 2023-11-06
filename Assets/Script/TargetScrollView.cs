@@ -7,12 +7,13 @@ public class TargetScrollView : ScrollViewScript<int>
     private void Start()
     {
         base.Start();
+        actions.Add(UpdateItemData);
         EventManager.AddListening("target", "refresh_target", (ArrayList data) =>
         {
             RefreshList(this.data);
         });
     }
-    protected override void UpdateItemData(Button cell, int index)
+    protected void UpdateItemData(Button cell, int index)
     {
         TextMeshProUGUI content = cell.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
 
