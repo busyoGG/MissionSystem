@@ -13,13 +13,17 @@ public class AwardScrollView : ScrollViewScript<int>
             RefreshList(this.data);
         });
     }
-    protected void UpdateItemData(Button cell, int index)
+    protected void UpdateItemData(ItemTransformData cell, int index)
     {
-        TextMeshProUGUI content = cell.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI content = cell.item.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
 
         int id = (int)data[0];
 
         MissionTree mission = MissionManager.Instance().GetUnlockedMissionById(id);
+        if (mission == null)
+        {
+            mission = MissionManager.Instance().GetUnlockedMissionById(id);
+        }
 
         content.text = mission.award[index] + " ÊýÁ¿£º" + mission.award_num[index];
     }

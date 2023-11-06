@@ -80,7 +80,7 @@ public class ScrollViewScript<T> : MonoBehaviour
         }
     }
 
-    protected List<Action<Button, int>> actions
+    protected List<Action<ItemTransformData, int>> actions
     {
         get
         {
@@ -128,9 +128,11 @@ public class ScrollViewScript<T> : MonoBehaviour
 
     private List<Vector2> _itemPos = new List<Vector2>();
 
+    private Dictionary<int, Dictionary<int, Vector2>> _itemSize = new Dictionary<int, Dictionary<int, Vector2>>();
+
     private int _scrollDirection = 0;
 
-    private List<Action<Button, int>> _actions = new List<Action<Button, int>>();
+    private List<Action<ItemTransformData, int>> _actions = new List<Action<ItemTransformData, int>>();
 
     public void Start()
     {
@@ -152,8 +154,6 @@ public class ScrollViewScript<T> : MonoBehaviour
 
             ItemTransformData itd = new ItemTransformData();
             itd.item = item;
-            itd.width = itemRect.rect.width;
-            itd.height = itemRect.rect.height;
             itd.pos = new Vector2();
             itd.item_type = i;
 
@@ -171,8 +171,6 @@ public class ScrollViewScript<T> : MonoBehaviour
 
                 ItemTransformData itd2 = new ItemTransformData();
                 itd2.item = item2;
-                itd2.width = itemRect2.rect.width;
-                itd2.height = itemRect2.rect.height;
                 itd2.pos = new Vector2();
                 itd2.item_type = i;
 
@@ -186,6 +184,7 @@ public class ScrollViewScript<T> : MonoBehaviour
     private void OnScroll(Vector2 v)
     {
         ////Debug.Log(v);
+        if (_head == null || _tail == null) return;
         float rectY = _rectTransform.localPosition.y;
         float diff = rectY - _lastScrollPos.y;
         if (diff > 0)
@@ -230,8 +229,11 @@ public class ScrollViewScript<T> : MonoBehaviour
                     item.item.transform.localPosition = pos;
                     item.item.name = index + "";
                     _tail = item;
-                    Debug.Log("创建尾" + _tail.cell_index + " " + pos + " " + index);
-                    _actions[itemType[0]](item.item, item.item_index);
+                    //Debug.Log("创建尾" + _tail.cell_index + " " + pos + " " + index);
+                    if (itemType[0] < _actions.Count)
+                    {
+                        _actions[itemType[0]](item, item.item_index);
+                    }
                 }
             }
         }
@@ -254,8 +256,11 @@ public class ScrollViewScript<T> : MonoBehaviour
                     item.item.transform.localPosition = pos;
                     item.item.name = index + "";
                     _head = item;
-                    Debug.Log("创建头" + _head.cell_index + " " + pos + " " + index);
-                    _actions[itemType[0]](item.item, item.item_index);
+                    //Debug.Log("创建头" + _head.cell_index + " " + pos + " " + index);
+                    if (itemType[0] < _actions.Count)
+                    {
+                        _actions[itemType[0]](item, item.item_index);
+                    }
                 }
             }
 
@@ -283,6 +288,7 @@ public class ScrollViewScript<T> : MonoBehaviour
     private ItemTransformData CreateItem(int itemType, bool init = true)
     {
         ItemTransformData item;
+        //Debug.Log(itemType + "  " + _itemStack.Count);
         if (_itemStack[itemType].Count > 0)
         {
             item = _itemStack[itemType].Pop();
@@ -398,21 +404,16 @@ public class ScrollViewScript<T> : MonoBehaviour
 
     protected void RefreshList(List<T> data)
     {
-        Debug.Log("设置数据");
+        //Debug.Log("设置数据");
         RecycleAllCells();
         _data = data;
 
         InitItemType();
 
-        Resize();
-
-        //_head = -2;
-
-        //_length = count;
-
+        ResetCells();
     }
 
-    private void Resize()
+    private void ResetCells()
     {
         if (FitSize)
         {
@@ -436,12 +437,31 @@ public class ScrollViewScript<T> : MonoBehaviour
 
             if (isInit)
             {
-                _actions[type](itd.item, itd.item_index);
+                if (type < _actions.Count)
+                {
+                    _actions[type](itd, itd.item_index);
+                }
             }
 
             Vector2 pos = CalculatePosition(last, itd);
             _itemPos.Add(pos);
-            itd.item.gameObject.GetComponent<RectTransform>().localPosition = pos;
+            //第一次设置数据的时候初始化单元格大小 之后设置单元格大小
+            Dictionary<int, Vector2> sizeDic;
+            _itemSize.TryGetValue(type, out sizeDic);
+            if (sizeDic == null)
+            {
+                sizeDic = new Dictionary<int, Vector2>();
+                _itemSize.Add(type, sizeDic);
+            }
+            if (!sizeDic.ContainsKey(itd.item_index))
+            {
+                sizeDic.Add(itd.item_index, new Vector2(itd.width, itd.height));
+            }
+            else
+            {
+                itd.size = sizeDic[itd.item_index];
+            }
+
             itd.pos = pos;
             last.next = itd;
             if (i != 0)
@@ -454,12 +474,19 @@ public class ScrollViewScript<T> : MonoBehaviour
             maxHeight = pos.y - itd.height;
 
             i++;
-            Debug.Log("设置item " + (i - 1) + "  " + maxHeight + " " + pos.y + " " + itd.height);
+            //Debug.Log("设置item " + (i - 1) + "  " + maxHeight + " " + pos.y + " " + itd.height);
         }
 
-
-        _head = _items[0];
-        _tail = _items[_items.Count - 1];
+        if (_items.Count > 0)
+        {
+            _head = _items[0];
+            _tail = _items[_items.Count - 1];
+        }
+        else
+        {
+            _head = null;
+            _tail = null;
+        }
 
 
         //更新UI大小
@@ -468,12 +495,20 @@ public class ScrollViewScript<T> : MonoBehaviour
         if (FitSize)
         {
             float contentHeight = _rectTransform.rect.height;
+            _viewHeight = contentHeight;
+            //if (contentHeight < _viewHeight)
+            //{
+            //    _viewHeight = contentHeight;
+            //}
 
-            if (contentHeight < _viewHeight)
-            {
-                _viewHeight = contentHeight;
-            }
+            Scroll.GetComponent<RectTransform>().sizeDelta = _rectTransform.sizeDelta;
         }
+    }
+
+    private void Resize()
+    {
+        RecycleAllCells();
+        ResetCells();
     }
 
     /// <summary>
@@ -489,5 +524,16 @@ public class ScrollViewScript<T> : MonoBehaviour
         }
 
         itemType = type;
+    }
+
+    /// <summary>
+    /// 设置单元格大小
+    /// </summary>
+    /// <param name="itd"></param>
+    /// <param name="size"></param>
+    protected void SetCellSize(ItemTransformData itd, Vector2 size)
+    {
+        _itemSize[itd.item_type][itd.item_index] = size;
+        Resize();
     }
 }

@@ -15,6 +15,8 @@ public class MissionPanelScript : MonoBehaviour
 
     private Vector3 _defPos;
 
+    private MissionTree _mission;
+
     void Start()
     {
         Debug.Log("³õÊ¼»¯panel");
@@ -32,16 +34,16 @@ public class MissionPanelScript : MonoBehaviour
     {
         Collect.onClick.AddListener(() =>
         {
-            MissionManager.Instance().SetCompleteNum(0, 0, 1);
+            MissionManager.Instance().SetCompleteNum(_mission.m_id, 0, 1);
             EventManager.TriggerEvent("refresh_target", null);
         });
 
         Complete.onClick.AddListener(() =>
         {
-            bool complete = MissionManager.Instance().CheckComplete(0);
+            bool complete = MissionManager.Instance().CheckComplete(_mission);
             if (complete)
             {
-                MissionManager.Instance().Next(0);
+                MissionManager.Instance().Next(_mission);
                 EventManager.TriggerEvent("refresh_mission_list", null);
                 Vector3 newPos = _defPos;
                 newPos.x += 1000;
@@ -52,10 +54,12 @@ public class MissionPanelScript : MonoBehaviour
 
     private void InitEventListener()
     {
+
         EventManager.AddListening("panel", "refresh_mission_panel", (ArrayList data) =>
         {
             transform.localPosition = _defPos;
             MissionTree mission = (MissionTree)data[0];
+            _mission = mission;
 
             Title.text = mission.title;
             Description.text = mission.describe;

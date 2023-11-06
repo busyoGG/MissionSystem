@@ -37,6 +37,10 @@ public class MissionTree
 
     public List<int> unlock_mission { get; set; }
 
+    public List<int> branch { get; set; }
+
+    public int branch_belong { get; set; }
+
     public bool is_pre_unlock { get; set; }
 
     //等级限制等暂时不做
@@ -50,5 +54,6 @@ public class MissionTree
         award_num = new List<float>();
         unlock_mission = new List<int>();
         target_describe = new List<string>();
+        branch = new List<int>();
     }
 }

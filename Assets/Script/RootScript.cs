@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 
 public class RootScript : MonoBehaviour
@@ -13,17 +14,20 @@ public class RootScript : MonoBehaviour
         MissionManager.Instance().Init();
 
         List<string> subData = new List<string>();
-        List<MissionTree> data = new List<MissionTree> ();
+        List<MissionTree> data = new List<MissionTree>();
         Dictionary<int, MissionTree> unlockedMission = MissionManager.Instance().GetUnlockedMission();
 
         Dictionary<MissionFilter, bool> title = new Dictionary<MissionFilter, bool>();
         foreach (var tree in unlockedMission)
         {
-            data.Add(tree.Value);
-            if (!title.ContainsKey(tree.Value.filter))
+            if (tree.Value.filter != MissionFilter.Branch)
             {
-                title.Add(tree.Value.filter, true);
-                subData.Add(MissionManager.Instance().GetMissionFilterString(tree.Value.filter));
+                data.Add(tree.Value);
+                if (!title.ContainsKey(tree.Value.filter))
+                {
+                    title.Add(tree.Value.filter, true);
+                    subData.Add(MissionManager.Instance().GetMissionFilterString(tree.Value.filter));
+                }
             }
         }
 
@@ -52,14 +56,25 @@ public class RootScript : MonoBehaviour
             Dictionary<int, MissionTree> unlockedMission = MissionManager.Instance().GetUnlockedMission();
 
             Dictionary<MissionFilter, bool> title = new Dictionary<MissionFilter, bool>();
+            int subNum = 0;
             foreach (var tree in unlockedMission)
             {
-                missions.Add(tree.Value);
-                if (!title.ContainsKey(tree.Value.filter))
+                if (tree.Value.filter != MissionFilter.Branch)
                 {
-                    title.Add(tree.Value.filter, true);
-                    subData.Add(MissionManager.Instance().GetMissionFilterString(tree.Value.filter));
+                    missions.Add(tree.Value);
+                    if (!title.ContainsKey(tree.Value.filter))
+                    {
+                        title.Add(tree.Value.filter, true);
+                        //subData.Add(MissionManager.Instance().GetMissionFilterString(tree.Value.filter));
+                        if(subNum < (int)tree.Value.filter)
+                        {
+                            subNum = (int)tree.Value.filter;
+                        }
+                    }
                 }
+            }
+            for(int i = 0; i < subNum + 1; i++) {
+                subData.Add(MissionManager.Instance().GetMissionFilterString((MissionFilter)i));
             }
 
             List._subData = subData;

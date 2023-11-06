@@ -5,17 +5,57 @@ using UnityEngine.UI;
 
 public class ItemTransformData
 {
-    public Vector2 pos { get; set; }
+    public Vector2 pos
+    {
+        get
+        {
+            return _pos;
+        }
+        set
+        {
+            _pos = value;
+            item.transform.localPosition = pos;
+        }
+    }
 
-    public float height { get; set; }
+    public float height { 
+        get
+        {
+            return _item_rect.rect.height;
+        }
+    }
 
-    public float width { get; set; }
+    public float width
+    {
+        get
+        {
+            return _item_rect.rect.width;
+        }
+    }
+
+    public Vector2 size
+    {
+        set
+        {
+            _item_rect.sizeDelta = value;
+        }
+    }
 
     public int cell_index { get; set; }
 
     public int item_index { get; set; }
 
-    public Button item { get; set; }
+    public Button item {
+        get
+        {
+            return _item;
+        }
+        set
+        {
+            _item = value;
+            _item_rect = _item.GetComponent<RectTransform>();
+        }
+    }
 
     public int item_type { get; set; }
 
@@ -23,11 +63,15 @@ public class ItemTransformData
 
     public ItemTransformData parent { get; set; }
 
+    private Button _item;
+
+    private RectTransform _item_rect;
+
+    private Vector2 _pos;
+
     public void CloneTo(ItemTransformData itd)
     {
         itd.pos = pos;
-        itd.height = height;
-        itd.width = width;
         itd.cell_index = cell_index;
         itd.item_index = item_index;
         itd.item = item;

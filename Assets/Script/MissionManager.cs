@@ -15,7 +15,8 @@ public enum MissionType
 public enum MissionFilter
 {
     Main,
-    Sub
+    Sub,
+    Branch//这个类型一定放最后 因为该类型不参与计算，枚举数不能影响计算
 }
 
 /// <summary>
@@ -91,8 +92,8 @@ public class MissionManager
         m2.target.Add(0);
         m2.target_describe.Add("收集id=0的物品");
         m2.target_num.Add(0, 2);
-        m2.award.Add("奖励1");
-        m2.award_num.Add(1);
+        //m2.award.Add("奖励1");
+        //m2.award_num.Add(1);
 
         m1.next = m2;
 
@@ -111,10 +112,29 @@ public class MissionManager
         m3.award_num.Add(1);
         //m3.is_pre_unlock = true;
 
+
+        MissionTree m4 = new MissionTree();
+        m4.id = 0;
+        m4.m_id = 2;
+        m4.title = "任务3-1";
+        m4.describe = "任务3-1的任务描述";
+        m4.type = MissionType.Collection;
+        m4.filter = MissionFilter.Branch;
+        m4.is_pre_count = false;
+        m4.target.Add(0);
+        m4.target_describe.Add("收集id=0的物品");
+        m4.target_num.Add(0, 2);
+        m4.award.Add("奖励1");
+        m4.award_num.Add(1);
+        m4.is_pre_unlock = true;
+        m4.branch_belong = 0;
+
         m1.unlock_mission.Add(1);
+        m2.branch.Add(2);
 
         missions.Add(m1);
         missions.Add(m3);
+        missions.Add(m4);
 
         //初始化
         for (int i = 0, len = missions.Count; i < len; i++)
@@ -261,9 +281,9 @@ public class MissionManager
     /// </summary>
     /// <param name="missionId"></param>
     /// <returns></returns>
-    public bool CheckComplete(int missionId)
+    public bool CheckComplete(MissionTree mission)
     {
-        MissionTree mission = _unlockedMission[missionId];
+        //MissionTree mission = _unlockedMission[missionId];
         for (int i = 0, len = mission.target.Count; i < len; i++)
         {
             int target = mission.target[i];
@@ -275,9 +295,10 @@ public class MissionManager
         return true;
     }
 
-    public void Next(int missionId)
+    public void Next(MissionTree mission)
     {
-        MissionTree mission = _unlockedMission[missionId];
+        //MissionTree mission = _unlockedMission[missionId];
+        int missionId = mission.m_id;
         MissionTree next = mission.next;
         if (next != null)
         {
@@ -293,8 +314,6 @@ public class MissionManager
                     SaveMissionData(id, unlockMission.id, unlockMission.complete_num, false);
                 }
             }
-            //获得奖励
-            GetAward(mission);
             //下一任务
             _unlockedMission[missionId] = next;
             //保存数据
@@ -306,6 +325,14 @@ public class MissionManager
             _doneMission.Add(missionId, mission);
             //保存数据
             SaveMissionData(missionId, mission.id, mission.complete_num, true);
+        }
+
+        //获得奖励
+        GetAward(mission);
+
+        if (mission.filter == MissionFilter.Branch)
+        {
+            Next(GetUnlockedMissionById(mission.branch_belong));
         }
     }
 
