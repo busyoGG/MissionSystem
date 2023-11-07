@@ -13,6 +13,8 @@ public class RootScript : MonoBehaviour
         MissionManager.Instance().LoadSaveData(Save);
         MissionManager.Instance().Init();
 
+        MissionManager.Instance().RefreshPreCountNum(0,3);
+
         List<string> subData = new List<string>();
         List<MissionTree> data = new List<MissionTree>();
         Dictionary<int, MissionTree> unlockedMission = MissionManager.Instance().GetUnlockedMission();

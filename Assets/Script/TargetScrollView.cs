@@ -20,13 +20,20 @@ public class TargetScrollView : ScrollViewScript<int>
         int id = (int)data[0];
 
         MissionTree mission = MissionManager.Instance().GetUnlockedMissionById(id);
-        if(mission == null)
+        if (mission == null)
         {
             mission = MissionManager.Instance().GetUnlockedMissionById(id);
         }
 
         float compeleteNum;
-        mission.complete_num.TryGetValue(mission.target[index], out compeleteNum);
+        if (mission.is_pre_count)
+        {
+            compeleteNum = MissionManager.Instance().GetPreCountNum(mission.target[index]);
+        }
+        else
+        {
+            mission.complete_num.TryGetValue(mission.target[index], out compeleteNum);
+        }
 
         if (compeleteNum > mission.target_num[index])
         {

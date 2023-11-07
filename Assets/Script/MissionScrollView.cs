@@ -122,9 +122,11 @@ public class MissionScrollView : ScrollViewScript<MissionTree>
         bsv.inputData = missionTrees;
         RectTransform bsvRect = bsv.Scroll.GetComponent<RectTransform>();
         //bsvRect.sizeDelta = new Vector2(bsv]Rect.rect.width, 0);
-        if (cell.height >= bsvRect.rect.height + 50)
+
+        Vector2 cellSize = GetCellSize(cell);
+        if (cellSize.y >= bsvRect.rect.height + 50)
         {
-            SetCellSize(cell, new Vector2(cell.width, 50 + bsvRect.rect.height),false);
+            SetCellSize(cell, new Vector2(cellSize.x, 50 + bsvRect.rect.height),false);
             bsv.Scroll.transform.localPosition = new Vector2(10, bsv.Scroll.transform.localPosition.y);
         }
         else
@@ -135,14 +137,14 @@ public class MissionScrollView : ScrollViewScript<MissionTree>
         cell.item.onClick.RemoveAllListeners();
         cell.item.onClick.AddListener(() =>
         {
-            if (cell.height >= bsvRect.rect.height + 50)
+            if (cellSize.y >= bsvRect.rect.height + 50)
             {
-                SetCellSize(cell, new Vector2(cell.width, 50));
+                SetCellSize(cell, new Vector2(cellSize.x, 50));
                 bsv.Scroll.transform.localPosition = new Vector2(-1000, bsv.Scroll.transform.localPosition.y);
             }
             else
             {
-                SetCellSize(cell, new Vector2(cell.width, 50 + bsvRect.rect.height));
+                SetCellSize(cell, new Vector2(cellSize.x, 50 + bsvRect.rect.height));
                 bsv.Scroll.transform.localPosition = new Vector2(10, bsv.Scroll.transform.localPosition.y);
             }
         });

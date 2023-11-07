@@ -21,7 +21,7 @@ public enum MissionFilter
 
 /// <summary>
 /// 任务管理器
-/// <para>请在预计数物品数量（即背包、杀人数等）加载之前加载本类，并且在预计数物品数量加载时执行RefreshPreCountNum方法</para>
+/// <para>请在预统计物品数量（即背包、杀人数等）加载之前加载本类，并且在预统计物品数量加载时执行RefreshPreCountNum方法</para>
 /// </summary>
 public class MissionManager
 {
@@ -34,6 +34,8 @@ public class MissionManager
     private Dictionary<int, MissionTree> _doneMission = new Dictionary<int, MissionTree>();
 
     private Dictionary<int, MissionSaveData> _missionSaveData = new Dictionary<int, MissionSaveData>();
+
+    private Dictionary<int, float> _preCount = new Dictionary<int, float>();
 
     private MissionTree _curMission;
 
@@ -73,7 +75,7 @@ public class MissionManager
         m1.describe = "任务1-1的任务描述\n测试换行";
         m1.type = MissionType.Collection;
         m1.filter = MissionFilter.Main;
-        m1.is_pre_count = false;
+        m1.is_pre_count = true;
         m1.target.Add(0);
         m1.target_describe.Add("收集id=0的物品");
         m1.target_num.Add(0, 2);
@@ -249,20 +251,34 @@ public class MissionManager
     }
 
     /// <summary>
-    /// 刷新预计数类型任务的完成数量
+    /// 刷新预统计类型任务的完成数量
     /// </summary>
     /// <param name="targetId"></param>
     /// <param name="num"></param>
-    public void RefreshPreCountNum(int targetId, float num)
+    public void RefreshPreCountNum(int targetId, float num, bool isAdd = false)
     {
-        foreach (var item in _unlockedMission)
+        if (!_preCount.ContainsKey(targetId))
         {
-            MissionTree mission = item.Value;
-            if (mission.is_pre_count)
-            {
-                SetCompleteNum(mission.m_id, targetId, num, false);
-            }
+            _preCount.Add(targetId, 0);
         }
+        if (isAdd)
+        {
+            _preCount[targetId] += num;
+        }
+        else
+        {
+            _preCount[targetId] = num;
+        }
+    }
+
+    /// <summary>
+    /// 获得预统计数量
+    /// </summary>
+    /// <param name="targetId"></param>
+    /// <returns></returns>
+    public float GetPreCountNum(int targetId)
+    {
+        return _preCount[targetId];
     }
 
     /// <summary>
@@ -301,13 +317,22 @@ public class MissionManager
     /// <returns></returns>
     public bool CheckComplete(MissionTree mission)
     {
-        //MissionTree mission = _unlockedMission[missionId];
         for (int i = 0, len = mission.target.Count; i < len; i++)
         {
             int target = mission.target[i];
-            if (mission.complete_num.Count == 0 || mission.target_num[target] > mission.complete_num[target])
+            if (mission.is_pre_count)
             {
-                return false;
+                if (mission.target_num[target] > _preCount[target])
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (mission.complete_num.Count == 0 || mission.target_num[target] > mission.complete_num[target])
+                {
+                    return false;
+                }
             }
         }
         return true;

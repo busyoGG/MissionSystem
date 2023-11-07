@@ -1,13 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection;
-using Unity.VisualScripting;
-using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 public class ScrollViewScript<T> : MonoBehaviour
 {
@@ -163,7 +157,7 @@ public class ScrollViewScript<T> : MonoBehaviour
             }
             _itemStack[i].Push(itd);
 
-            for (int j = 0, len2 = (int)MathF.Ceiling(_viewHeight / itd.height); j < len2; j++)
+            for (int j = 0, len2 = (int)Mathf.Ceil(_viewHeight / itd.height) * (int)Mathf.Ceil(_viewWidth / itd.width); j < len2; j++)
             {
                 Button item2 = Instantiate(PrefabItem[i]);
                 item2.transform.SetParent(obj.transform);
@@ -642,6 +636,22 @@ public class ScrollViewScript<T> : MonoBehaviour
         if (resize)
         {
             Resize();
+        }
+    }
+    /// <summary>
+    /// 获得单元格大小
+    /// </summary>
+    /// <param name="itd"></param>
+    /// <returns></returns>
+    protected Vector2 GetCellSize(ItemTransformData itd)
+    {
+        if (_itemSize.ContainsKey(itd.item_type))
+        {
+            return _itemSize[itd.item_type][itd.item_index];
+        }
+        else
+        {
+            return itd.size;
         }
     }
 }
