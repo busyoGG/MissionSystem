@@ -87,7 +87,7 @@ public class ScrollViewScript<T> : MonoBehaviour
             return _actions;
         }
     }
-
+    private bool _inited = false;
     private List<int[]> _itemType = new List<int[]>();
     /// <summary>
     /// 默认列表数据
@@ -178,15 +178,48 @@ public class ScrollViewScript<T> : MonoBehaviour
             }
         }
 
+        if (FitSize)
+        {
+            Scroll.vertical = false;
+            Scroll.horizontal = false;
+        }
+        else
+        {
+            if (RepeatY != 0)
+            {
+                Scroll.vertical = false;
+            }
+            else
+            {
+                Scroll.horizontal = false;
+            }
+        }
+
         Scroll.onValueChanged.AddListener(OnScroll);
+        _inited = true;
+        if (data != null && data.Count > 0)
+        {
+            data = data;
+        }
     }
 
     private void OnScroll(Vector2 v)
     {
         ////Debug.Log(v);
         if (_head == null || _tail == null) return;
-        float rectY = _rectTransform.localPosition.y;
-        float diff = rectY - _lastScrollPos.y;
+        float rect;
+        float diff;
+        if (RepeatY != 0)
+        {
+            rect = _rectTransform.localPosition.x;
+            diff = _lastScrollPos.x - rect;
+        }
+        else
+        {
+            rect = _rectTransform.localPosition.y;
+            diff = rect - _lastScrollPos.y;
+        }
+
         if (diff > 0)
         {
             _scrollDirection = 1;
@@ -202,7 +235,17 @@ public class ScrollViewScript<T> : MonoBehaviour
 
         if (_scrollDirection == 1)
         {
-            if (_head.pos.y - _head.height + rectY > 0)
+            bool checkRecycleHead;
+            if (RepeatY != 0)
+            {
+                checkRecycleHead = _head.pos.x + _head.width + rect < 0;
+            }
+            else
+            {
+                checkRecycleHead = _head.pos.y - _head.height + rect > 0;
+            }
+
+            if (checkRecycleHead)
             {
                 if (_head.next != null)
                 {
@@ -212,8 +255,17 @@ public class ScrollViewScript<T> : MonoBehaviour
                 }
             }
 
+            bool checkRecycleTail;
+            if (RepeatY != 0)
+            {
+                checkRecycleTail = _tail.pos.x + rect < _viewWidth;
+            }
+            else
+            {
+                checkRecycleTail = _tail.pos.y + rect > -_viewHeight;
+            }
             //Debug.Log(_tail.pos.y + rectY + " : " + _viewHeight);
-            if (_tail.pos.y + rectY > -_viewHeight)
+            if (checkRecycleTail)
             {
                 int index = _tail.cell_index + 1;
                 if (index < _itemType.Count)
@@ -239,8 +291,17 @@ public class ScrollViewScript<T> : MonoBehaviour
         }
         else if (_scrollDirection == -1)
         {
+            bool checkRecycleHead;
+            if (RepeatY != 0)
+            {
+                checkRecycleHead = _head.pos.x + _head.width + rect > 0;
+            }
+            else
+            {
+                checkRecycleHead = _head.pos.y - _head.height + rect < 0;
+            }
             //Debug.Log(_head.pos.y - _head.height + rectY);
-            if (_head.pos.y - _head.height + rectY < 0)
+            if (checkRecycleHead)
             {
                 int index = _head.cell_index - 1;
                 if (index >= 0)
@@ -264,8 +325,17 @@ public class ScrollViewScript<T> : MonoBehaviour
                 }
             }
 
+            bool checkRecycleTail;
+            if (RepeatY != 0)
+            {
+                checkRecycleTail = _tail.pos.x + rect > _viewWidth;
+            }
+            else
+            {
+                checkRecycleTail = _tail.pos.y + rect < -_viewHeight;
+            }
             //Debug.Log(_tail.pos.y + rectY + " : " + -_viewHeight);
-            if (_tail.pos.y + rectY < -_viewHeight)
+            if (checkRecycleTail)
             {
                 if (_tail.parent != null)
                 {
@@ -412,12 +482,14 @@ public class ScrollViewScript<T> : MonoBehaviour
     protected void RefreshList(List<T> data)
     {
         //Debug.Log("设置数据");
-        RecycleAllCells();
         _data = data;
 
-        InitItemType();
-
-        ResetCells();
+        if (_inited)
+        {
+            RecycleAllCells();
+            InitItemType();
+            ResetCells();
+        }
     }
 
     private void ResetCells()
@@ -431,12 +503,25 @@ public class ScrollViewScript<T> : MonoBehaviour
         ItemTransformData last = new ItemTransformData();
         int i = 0;
         float maxY = 0;
+        float maxX = 0;
         float maxHeight = 0;
+        float maxWidth = 0;
         while (i < itemType.Count)
         {
             int type = itemType[i][0];
 
-            bool isInit = maxY > -_viewHeight;
+            bool isInit = true;
+            if (!FitSize)
+            {
+                if (RepeatY != 0)
+                {
+                    isInit = maxX < _viewHeight;
+                }
+                else
+                {
+                    isInit = maxY > -_viewHeight;
+                }
+            }
             ItemTransformData itd = CreateItem(type, isInit);
             itd.cell_index = i;
             itd.item_index = itemType[i][1];
@@ -478,7 +563,17 @@ public class ScrollViewScript<T> : MonoBehaviour
             last = itd;
 
             maxY = pos.y;
-            maxHeight = pos.y - itd.height;
+            maxX = pos.x;
+            float maxH = pos.y - itd.height;
+            float maxW = pos.x + itd.width;
+            if (maxH < maxHeight)
+            {
+                maxHeight = maxH;
+            }
+            if (maxW > maxWidth)
+            {
+                maxWidth = maxW;
+            }
 
             i++;
             //Debug.Log("设置item " + (i - 1) + "  " + maxHeight + " " + pos.y + " " + itd.height);
@@ -497,19 +592,21 @@ public class ScrollViewScript<T> : MonoBehaviour
 
 
         //更新UI大小
-        _rectTransform.sizeDelta = new Vector2(0, -maxHeight);
+        _rectTransform.sizeDelta = new Vector2(maxWidth, -maxHeight);
 
         if (FitSize)
         {
             float contentHeight = _rectTransform.rect.height;
             _viewHeight = contentHeight;
+            float contentWidth = _rectTransform.rect.width;
+            _viewWidth = contentWidth;
             //if (contentHeight < _viewHeight)
             //{
             //    _viewHeight = contentHeight;
             //}
 
             RectTransform scrollRect = Scroll.GetComponent<RectTransform>();
-            scrollRect.sizeDelta = new Vector2(scrollRect.rect.width, -maxHeight);
+            scrollRect.sizeDelta = new Vector2(maxWidth, -maxHeight);
         }
     }
 
