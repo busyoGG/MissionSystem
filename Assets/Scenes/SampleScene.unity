@@ -1929,7 +1929,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9073202287304000470, guid: dc6a77beac546c546a592896da09d856, type: 3}
       propertyPath: RepeatX
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9073202287304000470, guid: dc6a77beac546c546a592896da09d856, type: 3}
+      propertyPath: RepeatY
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9073202287304000470, guid: dc6a77beac546c546a592896da09d856, type: 3}
       propertyPath: PrefabItem.Array.size

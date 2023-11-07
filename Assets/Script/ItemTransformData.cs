@@ -18,10 +18,18 @@ public class ItemTransformData
         }
     }
 
-    public float height { 
+    public float height
+    {
         get
         {
-            return _item_rect.rect.height;
+            if (_item_rect)
+            {
+                return _item_rect.rect.height;
+            }
+            else
+            {
+                return 0f;
+            }
         }
     }
 
@@ -29,7 +37,14 @@ public class ItemTransformData
     {
         get
         {
-            return _item_rect.rect.width;
+            if (_item_rect)
+            {
+                return _item_rect.rect.width;
+            }
+            else
+            {
+                return 0f;
+            }
         }
     }
 
@@ -45,7 +60,8 @@ public class ItemTransformData
 
     public int item_index { get; set; }
 
-    public Button item {
+    public Button item
+    {
         get
         {
             return _item;
