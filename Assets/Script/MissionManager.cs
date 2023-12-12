@@ -375,19 +375,20 @@ public class MissionManager
 
         if (mission.filter == MissionFilter.Branch)
         {
+            MissionTree branchMissionRoot = GetUnlockedMissionById(mission.branch_belong);
             bool missionDone = true;
-            foreach (var id in mission.branch)
+            foreach (var id in branchMissionRoot.branch)
             {
                 MissionTree branch = GetUnlockedMissionById(id);
-                if (mission != null)
+                if (branch != null)
                 {
                     missionDone = false;
                     break;
                 }
             }
-            if (!missionDone)
+            if (missionDone)
             {
-                Next(GetUnlockedMissionById(mission.branch_belong));
+                Next(branchMissionRoot);
             }
         }
     }
